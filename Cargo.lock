@@ -1,5 +1,5 @@
 [root]
-name = "test_sequence_web_application"
+name = "sequence_number_generator"
 version = "0.1.0"
 dependencies = [
  "hyper 0.10.10 (registry+https://github.com/rust-lang/crates.io-index)",

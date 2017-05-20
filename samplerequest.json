@@ -1,0 +1,13 @@
+{
+  "auth":
+  {
+    "auth_key" : "ec2ec768-e4c2-48dc-ac99-ef65a84ad156",
+    "email": "test@test.test"
+  },
+  "sequence":
+  {
+    "id" : "mytestid",
+    "value" : 1
+  },
+  "format" : "%d12"
+}

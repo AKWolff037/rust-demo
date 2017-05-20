@@ -1,0 +1,18 @@
+dev:
+  services:
+    - id: sameersbn/postgresql
+      tag: 9.4-1
+      env:
+        DB_USER: Alex
+        DB_PASS: dbpass
+        DB_NAME: test
+        LISTENING_PORT: localhost:8080
+  steps:
+    - script:
+        name: build
+        code: |
+          export DATABASE_URL=postgres://dbuser:dbpass@postgresql:5432/test
+          rustc -V
+          cargo -V
+          cargo build
+          cargo test --features integration_tests

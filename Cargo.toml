@@ -1,5 +1,5 @@
 [package]
-name = "test_sequence_web_application"
+name = "sequence_number_generator"
 version = "0.1.0"
 authors = ["Alex Wolff <akw5013@gmail.com>"]
 
@@ -13,3 +13,6 @@ rustc-serialize = "*"
 postgres = { version="*", features = ["with-uuid"] }
 r2d2="*"
 r2d2_postgres="*"
+
+[features]
+integration_tests = []

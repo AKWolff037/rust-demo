@@ -5,7 +5,18 @@ use uuid::Uuid;
 #[derive(RustcEncodable, RustcDecodable)]
 pub struct ApplicationRequest {
 	pub auth : UserAuthKey,
-	pub sequence : Sequence
+	pub sequence : Sequence,
+	pub format : String
+}
+
+impl ApplicationRequest {
+	pub fn new() -> ApplicationRequest {
+		ApplicationRequest {
+            auth : UserAuthKey { auth_key: Uuid::nil(), email: String::new() },
+            sequence: Sequence { id: String::new(), value: 0 },
+            format: String::new()
+        }
+	}
 }
 
 #[derive(RustcEncodable, RustcDecodable)]
@@ -33,7 +44,7 @@ pub fn create_auth(conn : &db::PostgresConnection, req : &ApplicationRequest) ->
 	panic!("Was unable to create a new authorization key");
 }
 pub fn check_user(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Result<bool, Error> {
-	try!(log_use(conn, req));
+	log_use(conn, req)?;
 	let qry = "SELECT active from user_auth_keys WHERE auth_key = $1";
 	for row in &conn.query(qry, &[&req.auth.auth_key]).unwrap() {
 		return Ok(row.get("active"));
@@ -41,7 +52,7 @@ pub fn check_user(conn : &db::PostgresConnection, req : &ApplicationRequest) -> 
 	Ok(false)
 }
 pub fn list_sequences(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Result<Vec<Sequence>, Error> {
-	try!(log_use(conn, req));
+	log_use(conn, req)?;
 	let mut sequences: Vec<Sequence> = Vec::new();
 	for row in &conn.query("SELECT sequence_id, sequence_value from sequences WHERE api_key = $1", &[&req.auth.auth_key]).unwrap() {
 		sequences.push(Sequence {
@@ -54,8 +65,8 @@ pub fn list_sequences(conn : &db::PostgresConnection, req : &ApplicationRequest)
 }
 
 pub fn create_sequence(conn: &db::PostgresConnection, req : &ApplicationRequest) -> Result<i64, Error> {
-	try!(log_use(conn, req));
-	for row in &conn.query("SELECT * FROM public.createnewsequence($1::varchar, $2::bigint, $3::uuid);", &[&req.sequence.id, &req.sequence.value, &req.auth.auth_key]).unwrap() {		
+	log_use(conn, req)?;
+	for row in &conn.query("SELECT * FROM createnewsequence($1::varchar, $2::bigint, $3::uuid);", &[&req.sequence.id, &req.sequence.value, &req.auth.auth_key]).unwrap() {
 		return Ok(row.get(0));
 	}
 	panic!("Was unable to create a sequence");

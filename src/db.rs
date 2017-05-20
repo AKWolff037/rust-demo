@@ -25,21 +25,21 @@ macro_rules! get_pg_connection {
 	})		
 }
 
-macro_rules! get_pg_connection_bool {
-	($req:expr) => (match $req.get::<persistent::Read<db::PostgresDB>>() {
-		Ok(pool) => match pool.get() {
-			Ok(conn) => conn,
-			Err(_) => {
-				println!("Couldn't get a connection to pg!");
-				panic!("Couldn't get a connection to pg!");
-			}
-		},
-		Err(_) => {
-			println!("Couldn't get the pg pool from the request!");
-			panic!("Couldn't get the pg pool from the request!");
-		}
-	})		
-}
+//macro_rules! get_pg_connection_bool {
+//	($req:expr) => (match $req.get::<persistent::Read<db::PostgresDB>>() {
+//		Ok(pool) => match pool.get() {
+//			Ok(conn) => conn,
+//			Err(_) => {
+//				println!("Couldn't get a connection to pg!");
+//				panic!("Couldn't get a connection to pg!");
+//			}
+//		},
+//		Err(_) => {
+//			println!("Couldn't get the pg pool from the request!");
+//			panic!("Couldn't get the pg pool from the request!");
+//		}
+//	})
+//}
 
 pub fn setup_database(conn : PostgresConnection) {
 	//Don't really need to do anything here
