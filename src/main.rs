@@ -176,6 +176,6 @@ fn listening_port() -> String {
 fn db_conn() -> String {
 	match env::var("DATABASE_URL") {
 		Ok(val) => val,
-		Err(_) => "postgres://Alex:mypass123@localhost:5432/myapp".to_string()
+		Err(_) => "postgres://docker:docker@localhost:5432/docker".to_string()
 	}
 }
