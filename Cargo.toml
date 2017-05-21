@@ -4,12 +4,14 @@ version = "0.1.0"
 authors = ["Alex Wolff <akw5013@gmail.com>"]
 
 [dependencies]
-uuid= { version = "0.4", features = ["v4", "rustc-serialize"] }
+serde="*"
+serde_json = "*"
+serde_derive = "*"
 iron="*"
 persistent="*"
 router = "*"
 hyper = "*"
-rustc-serialize = "*"
+uuid= { version = "0.4", features = ["serde", "v4"] }
 postgres = { version="*", features = ["with-uuid"] }
 r2d2="*"
 r2d2_postgres="*"

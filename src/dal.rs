@@ -1,8 +1,9 @@
 use postgres::error::Error;
 use db;
 use uuid::Uuid;
+use serde_derive::*;
 
-#[derive(RustcEncodable, RustcDecodable)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ApplicationRequest {
 	pub auth : UserAuthKey,
 	pub sequence : Sequence,
@@ -19,13 +20,13 @@ impl ApplicationRequest {
 	}
 }
 
-#[derive(RustcEncodable, RustcDecodable)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Sequence {
 	pub id: String,
 	pub value: i64
 }
 
-#[derive(RustcEncodable, RustcDecodable)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserAuthKey {
 	pub auth_key : Uuid,
 	pub email : String
@@ -63,7 +64,16 @@ pub fn list_sequences(conn : &db::PostgresConnection, req : &ApplicationRequest)
 	
 	Ok(sequences)
 }
-
+pub fn get_sequence(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Result<Sequence, Error> {
+	log_use(conn, req)?;
+	for row in &conn.query("SELECT sequence_id, sequence_value from sequences WHERE api_key = $1 and sequence_id = $2", &[&req.auth.auth_key, &req.sequence.id]).unwrap() {
+		return Ok(Sequence {
+			id: row.get(0),
+			value: row.get(1),
+		});
+	}
+	panic!("No sequence found with id {}", &req.sequence.id);
+}
 pub fn create_sequence(conn: &db::PostgresConnection, req : &ApplicationRequest) -> Result<i64, Error> {
 	log_use(conn, req)?;
 	for row in &conn.query("SELECT * FROM createnewsequence($1::varchar, $2::bigint, $3::uuid);", &[&req.sequence.id, &req.sequence.value, &req.auth.auth_key]).unwrap() {
