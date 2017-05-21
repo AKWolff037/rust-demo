@@ -4,14 +4,14 @@ version = "0.1.0"
 authors = ["Alex Wolff <akw5013@gmail.com>"]
 
 [dependencies]
-serde="*"
-serde_json = "*"
-serde_derive = "*"
+serde="0.9"
+serde_json = "0.9"
+serde_derive = "0.9"
 iron="*"
 persistent="*"
 router = "*"
 hyper = "*"
-uuid= { version = "0.4", features = ["serde", "v4"] }
+uuid= { version = "0.4.0", features = ["serde", "v4"] }
 postgres = { version="*", features = ["with-uuid"] }
 r2d2="*"
 r2d2_postgres="*"

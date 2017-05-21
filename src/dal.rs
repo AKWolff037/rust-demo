@@ -1,21 +1,20 @@
 use postgres::error::Error;
 use db;
 use uuid::Uuid;
-use serde_derive::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApplicationRequest {
 	pub auth : UserAuthKey,
 	pub sequence : Sequence,
-	pub format : String
+	pub format : Option<String>
 }
 
 impl ApplicationRequest {
 	pub fn new() -> ApplicationRequest {
 		ApplicationRequest {
-            auth : UserAuthKey { auth_key: Uuid::nil(), email: String::new() },
+            auth : UserAuthKey { auth_key: Uuid::nil(), email: None },
             sequence: Sequence { id: String::new(), value: 0 },
-            format: String::new()
+            format: None
         }
 	}
 }
@@ -29,7 +28,7 @@ pub struct Sequence {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserAuthKey {
 	pub auth_key : Uuid,
-	pub email : String
+	pub email : Option<String>
 }
 
 pub fn log_use(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Result<(), Error> {
@@ -38,9 +37,9 @@ pub fn log_use(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Res
 }
 
 pub fn create_auth(conn : &db::PostgresConnection, req : &ApplicationRequest) -> Result<UserAuthKey, Error> {	
-	let auth_email = &req.auth.email;
+	let auth_email = &req.auth.email.clone().unwrap_or_default();
 	for row in &conn.query("SELECT * FROM createnewauthid($1::VARCHAR)", &[&auth_email]).unwrap() {
-		return Ok(UserAuthKey { auth_key: row.get(0), email: String::new() });
+		return Ok(UserAuthKey { auth_key: row.get(0), email: row.get(1)});
 	}
 	panic!("Was unable to create a new authorization key");
 }
@@ -73,6 +72,13 @@ pub fn get_sequence(conn : &db::PostgresConnection, req : &ApplicationRequest) -
 		});
 	}
 	panic!("No sequence found with id {}", &req.sequence.id);
+}
+pub fn update_sequence(conn: &db::PostgresConnection, req : &ApplicationRequest) -> Result<i64, Error> {
+	log_use(conn, req)?;
+	for row in &conn.query("SELECT * FROM incrementandgetsequencenumber($1::varchar, $2::uuid);", &[&req.sequence.id, &req.auth.auth_key]).unwrap() {
+		return Ok(row.get(0));
+	}
+	panic!("Was unable to increment sequence {}", req.sequence.id);
 }
 pub fn create_sequence(conn: &db::PostgresConnection, req : &ApplicationRequest) -> Result<i64, Error> {
 	log_use(conn, req)?;
