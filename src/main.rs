@@ -169,13 +169,25 @@ fn main() {
 }
 fn listening_port() -> String {
     match env::var("LISTENING_PORT") {
-        Ok(val) => val,
-        Err(_) => "localhost:8080".to_string()
+        Ok(val) => {
+			println!("Success, returning listening port {}", val);
+			val
+		},
+        Err(_) => {
+			println!("Err: returning default listening port");
+			"0.0.0.0:8080".to_string()
+		}
     }
 }
 fn db_conn() -> String {
 	match env::var("DATABASE_URL") {
-		Ok(val) => val,
-		Err(_) => "postgres://docker:docker@localhost:5432/docker".to_string()
+		Ok(val) => {
+			println!("Success, returning db key {}", val);
+			val
+		},
+		Err(_) => {
+			println!("Err, no variable returning default");
+			"postgres://docker:docker@0.0.0.0:5432/docker".to_string()
+		}
 	}
 }
